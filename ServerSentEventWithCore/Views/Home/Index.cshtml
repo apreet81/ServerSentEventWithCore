@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Server Sent Event Sample</title>
+</head>
+
+<body>
+    <p>Open your web browser's console to see the eventing.</p>
+    <div>
+        <h4>Single source Events</h4>
+        <button id="middleware">Middleware</button>
+        <button id="controller">Controller</button>
+        <button id="close">Close</button>
+    </div>
+
+    <div>
+        <h4>Events all with separate source</h4>
+        <button id="source1">Source1</button>
+        <button id="closeSource1">CloseSource1</button>
+        <button id="source2">Source2</button>
+        <button id="closeSource2">CloseSource2</button>
+    </div>
+
+    <script type="text/javascript">
+
+        var source;
+
+        function listenForServerEvents(url) {
+            if (source) source.close();
+
+            source = new EventSource(url);
+
+            source.onmessage = function (event) {
+                console.log('onmessage: ' + event.data);
+            };
+
+            source.onopen = function (event) {
+                console.log('onopen');
+            };
+
+            source.onerror = function (event) {
+                console.log('onerror');
+                source.close();
+            };
+        }
+
+        function closeConnection() {
+            if (source) source.close();
+        }
+
+        document.getElementById("middleware").addEventListener("click", function () {
+            listenForServerEvents("sse");
+        });
+
+        document.getElementById("controller").addEventListener("click", function () {
+            listenForServerEvents("Home/GetStream");
+        });
+
+        document.getElementById("close").addEventListener("click", function () {
+            closeConnection();
+        });
+
+        listenForServerEvents('sse');
+
+        function initiateSource1() {
+            var source1;
+
+            function beginSource1Event(url) {
+                if (source1) source1.close();
+
+                source1 = new EventSource(url);
+
+                source1.onmessage = function (event) {
+                    console.log('source1 onmessage: ' + event.data);
+                };
+
+                source1.onopen = function (event) {
+                    console.log('onopen');
+                };
+
+                source1.onerror = function (event) {
+                    console.log('onerror');
+                    source1.close();
+                };
+            }
+
+            function closeSource1() {
+                if (source1) source1.close()
+            }
+
+            document.getElementById("source1").addEventListener("click", function () {
+                beginSource1Event("Home/GetMultipleStream?sourceID=1");
+            });
+
+            document.getElementById("closeSource1").addEventListener("click", function () {
+                closeSource1();
+            });
+
+        }
+
+        function initiateSource2() {
+            var source2;
+
+            function beginSource2Event(url) {
+                if (source2) source2.close();
+
+                source2 = new EventSource(url);
+
+                source2.onmessage = function (event) {
+                    console.log('source2 onmessage: ' + event.data);
+                };
+
+                source2.onopen = function (event) {
+                    console.log('onopen');
+                };
+
+                source2.onerror = function (event) {
+                    console.log('onerror');
+                    source2.close();
+                };
+            }
+
+            function closeSource2() {
+                if (source2) source2.close()
+            }
+
+            document.getElementById("source2").addEventListener("click", function () {
+                beginSource2Event("Home/GetMultipleStream?sourceID=2");
+            });
+
+            document.getElementById("closeSource2").addEventListener("click", function () {
+                closeSource2();
+            });
+
+        }
+
+        initiateSource1();
+        initiateSource2();
+
+    </script>
+</body>
+
+</html>
