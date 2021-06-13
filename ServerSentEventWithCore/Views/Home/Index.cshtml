@@ -67,81 +67,64 @@
         listenForServerEvents('sse');
 
         function initiateSource1() {
-            var source1;
+            var sources = [];
 
             function beginSource1Event(url) {
-                if (source1) source1.close();
 
-                source1 = new EventSource(url);
+                sources.push(new EventSource(url));
 
-                source1.onmessage = function (event) {
-                    console.log('source1 onmessage: ' + event.data);
-                };
+                for (var i = 0; i < sources.length; i++) {
 
-                source1.onopen = function (event) {
-                    console.log('onopen');
-                };
+                    sources[i].onmessage = function (event) {
+                        console.log('source1 onmessage: ' + event.data);
+                    };
 
-                source1.onerror = function (event) {
-                    console.log('onerror');
-                    source1.close();
-                };
+                    sources[i].onopen = function (event) {
+                        console.log('onopen');
+                    };
+
+                    sources[i].onerror = function (event) {
+                        console.log('onerror');
+                        closeSource1();
+                    };
+                }
             }
 
-            function closeSource1() {
-                if (source1) source1.close()
+            function closeSource1(sourceID) {
+                var source1;
+                if (!sourceID) {
+                    source1 = sources;
+                }
+                else {
+                    source1 = sources.filter(function (s) { return s.url == "http://localhost:22623/Home/GetMultipleStream?sourceID=" + sourceID });
+                }
+
+                if (source1) {
+                    for (var i = 0; i < source1.length; i++) {
+                        source1[i].close();
+                    }
+                    sources = [];
+                }
             }
 
             document.getElementById("source1").addEventListener("click", function () {
                 beginSource1Event("Home/GetMultipleStream?sourceID=1");
             });
 
-            document.getElementById("closeSource1").addEventListener("click", function () {
-                closeSource1();
+            document.getElementById("source2").addEventListener("click", function () {
+                beginSource1Event("Home/GetMultipleStream?sourceID=2");
             });
 
-        }
-
-        function initiateSource2() {
-            var source2;
-
-            function beginSource2Event(url) {
-                if (source2) source2.close();
-
-                source2 = new EventSource(url);
-
-                source2.onmessage = function (event) {
-                    console.log('source2 onmessage: ' + event.data);
-                };
-
-                source2.onopen = function (event) {
-                    console.log('onopen');
-                };
-
-                source2.onerror = function (event) {
-                    console.log('onerror');
-                    source2.close();
-                };
-            }
-
-            function closeSource2() {
-                if (source2) source2.close()
-            }
-
-            document.getElementById("source2").addEventListener("click", function () {
-                beginSource2Event("Home/GetMultipleStream?sourceID=2");
+            document.getElementById("closeSource1").addEventListener("click", function () {
+                closeSource1(1);
             });
 
             document.getElementById("closeSource2").addEventListener("click", function () {
-                closeSource2();
+                closeSource1(2);
             });
-
         }
 
         initiateSource1();
-        initiateSource2();
-
     </script>
 </body>
-
 </html>

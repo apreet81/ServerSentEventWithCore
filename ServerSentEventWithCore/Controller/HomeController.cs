@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ServerSentEventWithCore
 {
@@ -56,6 +58,12 @@ namespace ServerSentEventWithCore
                 {
                     break;
                 }
+
+                // Need to investigate approach for sending json data.
+                //await response.WriteAsJsonAsync(new { Datetime = DateTime.Now, SourceID = sourceID, IterationNumber = i }, new JsonSerializerOptions { }, "text/event-stream");
+                //var json = JsonConvert.SerializeObject(new { Datetime = DateTime.Now, SourceID = sourceID, IterationNumber = i });
+                //await response.WriteAsync(json);
+
                 await response
                     .WriteAsync($"data: Controller {i} at {DateTime.Now} with source ID : {sourceID}\r\r");
 
